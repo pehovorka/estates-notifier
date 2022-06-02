@@ -9,10 +9,8 @@ const store = async (estates: Estate[]) => {
     const estateDocSnapshot = await estateRef.get();
     if (!estateDocSnapshot.exists) {
       await estateRef.set(estate);
-      // newOffers.push(estate);
+      newOffers.push(estate);
     }
-    // TODO: delete and uncomment line above
-    newOffers.push(estate);
   }
   return newOffers;
 };
