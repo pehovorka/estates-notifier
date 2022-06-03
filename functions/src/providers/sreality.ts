@@ -28,7 +28,7 @@ const sreality: Provider = {
     }
     return estates;
   },
-  transform: (data) => {
+  transform: (data: SrealityEstate[]) => {
     return data.map((estate) => ({
       id: estate._links.self.href.split("/estates/")[1].toString(),
       sourceId: estate._links.self.href.split("/estates/")[1],
@@ -47,10 +47,10 @@ const sreality: Provider = {
         (item) => `${item.name}: ${item.value} ${item.unit ?? ""}`
       ),
       broker: `${
-        estate._embedded.seller.user_name
-      } – ${estate._embedded.seller.phones
+        estate._embedded.seller?.user_name
+      } – ${estate._embedded.seller?.phones
         .map((phone) => `${phone.number}`)
-        .join(", ")} | ${estate._embedded.seller.email}`,
+        .join(", ")} | ${estate._embedded.seller?.email}`,
     }));
   },
 };

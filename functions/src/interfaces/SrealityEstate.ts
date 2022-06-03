@@ -252,7 +252,7 @@ interface Image {
 interface Embedded {
   favourite: Favourite;
   calculator?: any;
-  seller: Seller;
+  seller?: Seller;
   note: Note;
   images: Image[];
   matterport_url: string;

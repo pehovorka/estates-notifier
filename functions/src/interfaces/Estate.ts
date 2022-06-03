@@ -1,3 +1,4 @@
+import { BezrealitkyEstatesList } from "./BezrealitkyEstatesList";
 import { SrealityEstate } from "./SrealityEstate";
 
 export enum ProviderName {
@@ -14,6 +15,7 @@ export interface Estate {
   locality: string;
   price: number;
   servicesPrice?: number;
+  deposit?: number;
   gps: {
     lat: number;
     lon: number;
@@ -27,6 +29,6 @@ export interface Estate {
 
 export interface Provider {
   name: ProviderName;
-  fetchSource: () => Promise<SrealityEstate[]>;
-  transform: (data: SrealityEstate[]) => Estate[];
+  fetchSource: () => Promise<SrealityEstate[] | BezrealitkyEstatesList>;
+  transform: (data: any) => Estate[];
 }

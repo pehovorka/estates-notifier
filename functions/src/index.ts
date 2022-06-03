@@ -1,19 +1,23 @@
 import * as functions from "firebase-functions";
-import { sreality as srealityProvider } from "./providers";
+import { sreality, bezrealitky } from "./providers";
 import { send } from "./sendEstate";
 import { store } from "./storeEstates";
 
-export const sreality = functions
+const providers = [sreality, bezrealitky];
+
+export const checkEstates = functions
   .region("europe-west3")
-  .runWith({ timeoutSeconds: 180 })
+  .runWith({ timeoutSeconds: 240 })
   .pubsub.schedule("every 5 minutes")
   .timeZone("Europe/Prague")
   .onRun(async () => {
-    const res = await srealityProvider.fetchSource();
-    const transformed = srealityProvider.transform(res);
-    const newOffers = await store(transformed);
+    for (const provider of providers) {
+      const res = await provider.fetchSource();
+      const transformed = provider.transform(res);
+      const newOffers = await store(transformed);
 
-    for (const offer of newOffers) {
-      await send(offer);
+      for (const offer of newOffers) {
+        await send(offer);
+      }
     }
   });
