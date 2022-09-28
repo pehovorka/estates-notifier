@@ -3,10 +3,12 @@ import { Provider, ProviderName, BezrealitkyEstatesList } from "../interfaces";
 
 const BASE_URL = "https://api.bezrealitky.cz/graphql/";
 const LIMIT = 5;
+const MAX_PRICE = 12750;
+
 const body = {
   operationName: "AdvertList",
   variables: {},
-  query: `query AdvertList {\n  listAdverts(offerType: PRONAJEM, estateType: BYT, order: TIMEORDER_DESC, regionOsmId: "R435541", priceTo: 12500, limit: ${LIMIT}, roommate: false) {\n    list {\n      id\n      daysActive\n      visitCount\n      deposit\n      fee\n      surface\n      etage\n      description\n      price\n      charges\n      disposition\n      street\n      addressInput\n      address(locale: CS)\n      gps {\n        lat\n        lng\n      }\n      uri\n      mainImage {\n        url(filter: RECORD_MAIN)\n      }\n      publicImages {\n        url(filter: RECORD_MAIN)\n      }\n      formattedParameters(locale: CS) {\n        title\n        value\n      }\n      broker {\n        fullName\n      }\n    }\n  }\n}\n`,
+  query: `query AdvertList {\n  listAdverts(offerType: PRONAJEM, estateType: BYT, order: TIMEORDER_DESC, regionOsmId: "R435541", priceTo: ${MAX_PRICE}, limit: ${LIMIT}, roommate: false) {\n    list {\n      id\n      daysActive\n      visitCount\n      deposit\n      fee\n      surface\n      etage\n      description\n      price\n      charges\n      disposition\n      street\n      addressInput\n      address(locale: CS)\n      gps {\n        lat\n        lng\n      }\n      uri\n      mainImage {\n        url(filter: RECORD_MAIN)\n      }\n      publicImages {\n        url(filter: RECORD_MAIN)\n      }\n      formattedParameters(locale: CS) {\n        title\n        value\n      }\n      broker {\n        fullName\n      }\n    }\n  }\n}\n`,
 };
 
 const placeholderImageUrl =

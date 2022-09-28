@@ -5,7 +5,7 @@ import {
   WebClient,
 } from "@slack/web-api";
 
-import { Estate } from "./interfaces";
+import { Estate, ProviderName } from "./interfaces";
 
 // Read a token from the environment variables
 const token = process.env.SLACK_TOKEN;
@@ -24,8 +24,8 @@ const send = async (estate: Estate) => {
     estate.sourceProvider
   })*\n
 ${estate.price} Kč | ${
-    estate.servicesPrice && "+ " + estate.servicesPrice + "Kč | "
-  }${estate.deposit && "Kauce: " + estate.deposit + " | "}<${
+    estate.servicesPrice ? "+ " + estate.servicesPrice + "Kč | " : ""
+  }${estate.deposit ? "Kauce " + estate.deposit + "Kč | " : ""}<${
     estate.sourceUrl
   }|${estate.sourceProvider}.cz> | <https://mapy.cz/zakladni?source=coor&id=${
     estate.gps.lon
@@ -38,6 +38,12 @@ ${estate.broker ? "_" + estate.broker + "_" : ""}`;
     channel: CHANNEL,
     text: text,
     username: estate.sourceProvider,
+    icon_url:
+      estate.sourceProvider === ProviderName.sreality
+        ? "https://www.sreality.cz/img/sreality-app-logo2.png"
+        : estate.sourceProvider === ProviderName.bezrealitky
+        ? "https://www.bezrealitky.cz/favicon.png"
+        : "",
   });
 
   const uploadResults: FilesUploadResponse[] = [];
@@ -58,7 +64,7 @@ ${estate.broker ? "_" + estate.broker + "_" : ""}`;
   const attachments: MessageAttachment[] = [
     {
       title: `${estate.name} – ${estate.locality}`,
-      image_url: uploadResults[0].file?.permalink,
+      image_url: uploadResults[0]?.file?.permalink,
     },
   ];
 

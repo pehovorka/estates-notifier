@@ -6,9 +6,11 @@ import {
   SrealityEstatesList,
 } from "../interfaces";
 
-const BASE_URL = "https://www.sreality.cz/api";
 const PAGE_SIZE = 5;
-const PATH = `/cs/v2/estates?category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5&category_type_cb=2&czk_price_summary_order2=0%7C12500&distance=5&per_page=${PAGE_SIZE}&ready_date=%7C2022-07-04&region=m%C4%9Bstsk%C3%A1+%C4%8D%C3%A1st+Dejvice&region_entity_id=13698&region_entity_type=ward&tms=1654112579260&usable_area=26%7C10000000000`;
+const MAX_PRICE = 12750;
+
+const BASE_URL = "https://www.sreality.cz/api";
+const PATH = `/cs/v2/estates?category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5&category_type_cb=2&czk_price_summary_order2=0%7C${MAX_PRICE}&distance=5&per_page=${PAGE_SIZE}&ready_date=%7C2022-07-04&region=m%C4%9Bstsk%C3%A1+%C4%8D%C3%A1st+Dejvice&region_entity_id=13698&region_entity_type=ward&tms=1654112579260&usable_area=26%7C10000000000`;
 const URL = BASE_URL + PATH;
 
 const sreality: Provider = {
