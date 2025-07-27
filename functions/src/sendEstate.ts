@@ -50,9 +50,9 @@ ${estate.broker ? "_" + estate.broker + "_" : ""}`;
 
   if (estate.imageUrls) {
     for (const image of estate.imageUrls) {
-      const result = await web.files.upload({
-        channels: CHANNEL,
-        thread_ts: message.ts,
+      const result = await web.files.uploadV2({
+        channel_id: CHANNEL,
+        thread_ts: message.ts ?? "",
         file: await downloadImage(image),
         title: `${estate.name} – ${estate.locality}`,
         filename: "image.jpg",

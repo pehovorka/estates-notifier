@@ -1,16 +1,18 @@
-import * as functions from "firebase-functions";
+import { scheduler } from "firebase-functions";
 import { sreality, bezrealitky } from "./providers";
 import { send } from "./sendEstate";
 import { store } from "./storeEstates";
 
 const providers = [sreality, bezrealitky];
 
-export const checkEstates = functions
-  .region("europe-west3")
-  .runWith({ timeoutSeconds: 240 })
-  .pubsub.schedule("every 5 minutes")
-  .timeZone("Europe/Prague")
-  .onRun(async () => {
+export const checkEstates = scheduler.onSchedule(
+  {
+    schedule: "every 5 minutes",
+    timeZone: "Europe/Prague",
+    timeoutSeconds: 240,
+    region: "europe-west3",
+  },
+  async () => {
     for (const provider of providers) {
       const res = await provider.fetchSource();
       const transformed = provider.transform(res);
@@ -20,4 +22,5 @@ export const checkEstates = functions
         await send(offer);
       }
     }
-  });
+  }
+);
