@@ -7,11 +7,32 @@ import {
 } from "../interfaces";
 
 const PAGE_SIZE = 5;
-const MAX_PRICE = 15000;
+const MAX_PRICE = 16000;
 
 const BASE_URL = "https://www.sreality.cz/api";
-const PATH = `/cs/v2/estates?category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5&category_type_cb=2&czk_price_summary_order2=0%7C${MAX_PRICE}&distance=5&per_page=${PAGE_SIZE}&region=m%C4%9Bstsk%C3%A1+%C4%8D%C3%A1st+Dejvice&region_entity_id=13698&region_entity_type=ward&tms=1654112579260&usable_area=26%7C10000000000`;
+const PATH = `/cs/v2/estates?category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5&category_type_cb=2&czk_price_summary_order2=0%7C${MAX_PRICE}&per_page=${PAGE_SIZE}&locality_country_id=112&locality_region_id=10`;
 const URL = BASE_URL + PATH;
+
+const categorySubCbToUrlString = (categorySubCb: number) => {
+  switch (categorySubCb) {
+    case 2:
+      return "1+kk";
+    case 3:
+      return "1+1";
+    case 4:
+      return "2+kk";
+    case 5:
+      return "2+1";
+    default:
+      return "1+kk";
+  }
+};
+
+const composeSourceUrl = (estate: SrealityEstate) => {
+  return `https://www.sreality.cz/detail/pronajem/byt/${categorySubCbToUrlString(
+    estate.seo.category_sub_cb
+  )}/${estate.seo.locality}/${estate._links.self.href.split("/estates/")[1]}`;
+};
 
 const sreality: Provider = {
   name: ProviderName.sreality,
@@ -34,9 +55,7 @@ const sreality: Provider = {
     return data.map((estate) => ({
       id: estate._links.self.href.split("/estates/")[1].toString(),
       sourceId: estate._links.self.href.split("/estates/")[1],
-      sourceUrl: `https://www.sreality.cz/detail/pronajem/byt/_/_/${
-        estate._links.self.href.split("/estates/")[1]
-      }`,
+      sourceUrl: composeSourceUrl(estate),
       gps: { lat: estate.map.lat, lon: estate.map.lon },
       locality: estate.locality.value,
       name: estate.name.value,

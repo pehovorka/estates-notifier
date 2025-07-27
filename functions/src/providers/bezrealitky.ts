@@ -3,7 +3,7 @@ import { Provider, ProviderName, BezrealitkyEstatesList } from "../interfaces";
 
 const BASE_URL = "https://api.bezrealitky.cz/graphql/";
 const LIMIT = 5;
-const MAX_PRICE = 12750;
+const MAX_PRICE = 16000;
 
 const body = {
   operationName: "AdvertList",
