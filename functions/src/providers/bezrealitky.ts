@@ -18,7 +18,7 @@ const bezrealitky: Provider = {
   name: ProviderName.bezrealitky,
   fetchSource: async () => {
     const { data } = await axios.post<BezrealitkyEstatesList>(BASE_URL, body);
-    console.log(data);
+
     return data;
   },
   transform: (data: BezrealitkyEstatesList) => {

@@ -1,11 +1,15 @@
 import axios from "axios";
 import {
-  FilesUploadResponse,
-  MessageAttachment,
+  FilesCompleteUploadExternalResponse,
+  WebAPICallResult,
   WebClient,
 } from "@slack/web-api";
 
 import { Estate, ProviderName } from "./interfaces";
+
+type UploadResult = WebAPICallResult & {
+  files: FilesCompleteUploadExternalResponse[];
+};
 
 // Read a token from the environment variables
 const token = process.env.SLACK_TOKEN;
@@ -18,6 +22,34 @@ const web = new WebClient(token);
 
 // Prod
 const CHANNEL = "C03J2LEU3T6";
+
+const downloadImage = async (url: string) => {
+  return axios
+    .get<Buffer>(url, {
+      responseType: "stream",
+    })
+    .then((res) => res.data);
+};
+
+const uploadFiles = async (estate: Estate) => {
+  const uploadResults: UploadResult[] = [];
+
+  if (estate.imageUrls) {
+    for (const image of estate.imageUrls) {
+      const result = (await web.files.uploadV2({
+        file: await downloadImage(image),
+        title: `${estate.name} – ${estate.locality} (${
+          uploadResults.length + 1
+        }/${estate.imageUrls.length})`,
+        filename: "image.jpg",
+      })) as UploadResult;
+
+      uploadResults.push(result);
+    }
+  }
+
+  return uploadResults;
+};
 
 const send = async (estate: Estate) => {
   const text = `*${estate.name} – ${estate.locality} (${
@@ -34,9 +66,15 @@ ${estate.price} Kč | ${
 ${estate.details?.map((detail) => `• ${detail}`).join("\n")}\n
 ${estate.broker ? "_" + estate.broker + "_" : ""}`;
 
-  const message = await web.chat.postMessage({
+  const files = await uploadFiles(estate);
+
+  const attachmentsString = files
+    .map((file) => `<${file.files[0].files?.[0].permalink}| >`)
+    .join("");
+
+  await web.chat.postMessage({
     channel: CHANNEL,
-    text: text,
+    text: text + attachmentsString,
     username: estate.sourceProvider,
     icon_url:
       estate.sourceProvider === ProviderName.sreality
@@ -45,43 +83,6 @@ ${estate.broker ? "_" + estate.broker + "_" : ""}`;
         ? "https://www.bezrealitky.cz/favicon.png"
         : "",
   });
-
-  const uploadResults: FilesUploadResponse[] = [];
-
-  if (estate.imageUrls) {
-    for (const image of estate.imageUrls) {
-      const result = await web.files.uploadV2({
-        channel_id: CHANNEL,
-        thread_ts: message.ts ?? "",
-        file: await downloadImage(image),
-        title: `${estate.name} – ${estate.locality}`,
-        filename: "image.jpg",
-      });
-      uploadResults.push(result);
-    }
-  }
-
-  const attachments: MessageAttachment[] = [
-    {
-      title: `${estate.name} – ${estate.locality}`,
-      image_url: uploadResults[0]?.file?.permalink,
-    },
-  ];
-
-  web.chat.update({
-    channel: CHANNEL,
-    ts: message.ts ?? "1",
-    text: message.message?.text,
-    attachments: attachments,
-  });
-};
-
-const downloadImage = async (url: string) => {
-  return axios
-    .get<Buffer>(url, {
-      responseType: "stream",
-    })
-    .then((res) => res.data);
 };
 
 export { send };
